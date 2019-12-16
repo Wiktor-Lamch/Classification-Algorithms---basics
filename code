@@ -1,0 +1,82 @@
+# This script represents classification algoritms in R using packages: stats, party, rpart, randomForest and naivebayes.
+# In this script I use classification algorithms like: logistic regression, decision tree, random forest and naive bayes classification.
+
+
+test_data <- na.omit(train_dataset)
+
+test_data <- test_data[,-1]
+
+test_data$SurvivedFactor <- as.factor(test_data$Survived)
+
+view(test_data)
+
+
+# LOGISTIC REGRESSION
+
+reg_log_mod <- glm(data = test_data, Survived~Pclass+Sex+Age+SibSp, family = "binomial")
+summary(reg_log_mod)
+
+pred_reg_log_mod <- predict(reg_log_mod, test_data, type = "response")
+pred_reg_log_mod <- ifelse(pred_reg_log_mod >= 0.5, 1, 0)
+
+table(test_data$Survived, pred_reg_log_mod) -> table_1
+
+sum(diag(table_1))/sum(table_1)
+
+
+# DECISION TREE : PACKAGE PARTY
+
+library("party")
+
+dec_tree_mod <- ctree(data = test_data, SurvivedFactor~Pclass+Sex+Age+SibSp)
+dec_tree_mod
+plot(dec_tree_mod)
+
+pred_dec_tree_mod <- predict(dec_tree_mod)
+
+table(test_data$SurvivedFactor, pred_dec_tree_mod) -> table_2
+
+sum(diag(table_2))/sum(table_2)
+
+
+
+# DECISION TREE : PACKAGE RPART
+
+library("rpart")
+
+dec_tree_mod1 <- rpart(data = test_data, Survived~Pclass+Sex+Age+SibSp)
+dec_tree_mod1
+
+library("rpart.plot")
+
+rpart.plot(dec_tree_mod1)
+
+pred_dec_tree_mod1 <- ifelse(predict(dec_tree_mod1) >= 0.5, 1, 0)
+
+table(test_data$Survived, pred_dec_tree_mod1) -> table_3
+
+sum(diag(table_3))/sum(table_3)
+
+
+# Random forest from package: randomForest
+
+random_forest_mod <- randomForest(data = test_data, Survived~Pclass+Sex+Age+SibSp)
+
+pred_random_forest_mod <- ifelse(predict(random_forest_mod, test_data) >= 0.5, 1, 0)
+
+table(test_data$Survived, pred_random_forest_mod) -> table_4
+
+sum(diag(table_4))/sum(table_4)
+
+
+# Naive bayes classification from package: naivebayes
+
+naivebayes_mod <- naive_bayes(data = test_data, SurvivedFactor~Pclass+Sex+Age+SibSp)
+
+plot(naivebayes_mod)
+
+pred_naivebayes_mod <- predict(naivebayes_mod, test_data)
+
+table(test_data$Survived, pred_naivebayes_mod) -> table_5
+
+sum(diag(table_5))/sum(table_5)
